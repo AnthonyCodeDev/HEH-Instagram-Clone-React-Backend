@@ -81,6 +81,11 @@ class AuthServiceTests {
         
         when(saveUserPort.save(any(User.class))).thenReturn(savedUser);
         
+        System.out.println("✅ TEST: register_creates_user_and_returns_user");
+        System.out.println("📝 Username: " + username);
+        System.out.println("📝 Email: " + email);
+        System.out.println("📝 Expected: User created with correct username and email");
+        
         // Act
         RegisterUseCase.RegisterCommand command = RegisterUseCase.RegisterCommand.builder()
                 .username(username)
@@ -102,6 +107,8 @@ class AuthServiceTests {
         assertThat(capturedUser.getUsername().toString()).isEqualTo(username);
         assertThat(capturedUser.getEmail().toString()).isEqualTo(email);
         assertThat(capturedUser.getPasswordHash().getValue()).isEqualTo("hashed_password");
+        
+        System.out.println("✅ TEST PASSED: register_creates_user_and_returns_user");
     }
     
     @Test
@@ -112,6 +119,11 @@ class AuthServiceTests {
         String password = "Password123";
         
         when(loadUserPort.existsByUsername(username)).thenReturn(true);
+        
+        System.out.println("✅ TEST: register_throws_exception_when_username_already_exists");
+        System.out.println("📝 Username: " + username);
+        System.out.println("📝 Expected exception: ValidationException");
+        System.out.println("📝 Expected message: Username is already taken");
         
         // Act & Assert
         RegisterUseCase.RegisterCommand command = RegisterUseCase.RegisterCommand.builder()
@@ -126,6 +138,8 @@ class AuthServiceTests {
         
         verify(passwordEncoderPort, never()).encode(anyString());
         verify(saveUserPort, never()).save(any(User.class));
+        
+        System.out.println("✅ TEST PASSED: register_throws_exception_when_username_already_exists");
     }
     
     @Test
@@ -137,6 +151,11 @@ class AuthServiceTests {
         
         when(loadUserPort.existsByUsername(username)).thenReturn(false);
         when(loadUserPort.existsByEmail(email)).thenReturn(true);
+        
+        System.out.println("✅ TEST: register_throws_exception_when_email_already_exists");
+        System.out.println("📝 Email: " + email);
+        System.out.println("📝 Expected exception: ValidationException");
+        System.out.println("📝 Expected message: Email is already taken");
         
         // Act & Assert
         RegisterUseCase.RegisterCommand command = RegisterUseCase.RegisterCommand.builder()
@@ -151,6 +170,8 @@ class AuthServiceTests {
         
         verify(passwordEncoderPort, never()).encode(anyString());
         verify(saveUserPort, never()).save(any(User.class));
+        
+        System.out.println("✅ TEST PASSED: register_throws_exception_when_email_already_exists");
     }
     
     @Test
@@ -164,6 +185,10 @@ class AuthServiceTests {
         when(passwordEncoderPort.matches(password, user.getPasswordHash())).thenReturn(true);
         when(tokenProviderPort.generateToken(any(), anyString(), any(Boolean.class))).thenReturn("valid_token");
         
+        System.out.println("✅ TEST: login_returns_token_when_credentials_are_valid");
+        System.out.println("📝 Username/Email: " + usernameOrEmail);
+        System.out.println("📝 Expected token: valid_token");
+        
         // Act
         LoginUseCase.LoginCommand command = LoginUseCase.LoginCommand.builder()
                 .usernameOrEmail(usernameOrEmail)
@@ -176,6 +201,8 @@ class AuthServiceTests {
         assertThat(result).isNotNull();
         assertThat(result.getToken()).isEqualTo("valid_token");
         verify(tokenProviderPort).generateToken(any(UserId.class), anyString(), any(Boolean.class));
+        
+        System.out.println("✅ TEST PASSED: login_returns_token_when_credentials_are_valid");
     }
     
     @Test
@@ -185,6 +212,11 @@ class AuthServiceTests {
         String password = "Password123";
         
         when(loadUserPort.findByUsernameOrEmail(usernameOrEmail)).thenReturn(Optional.empty());
+        
+        System.out.println("✅ TEST: login_throws_exception_when_user_not_found");
+        System.out.println("📝 Username/Email: " + usernameOrEmail);
+        System.out.println("📝 Expected exception: UnauthorizedActionException");
+        System.out.println("📝 Expected message: Invalid credentials");
         
         // Act & Assert
         LoginUseCase.LoginCommand command = LoginUseCase.LoginCommand.builder()
@@ -197,6 +229,8 @@ class AuthServiceTests {
                 .hasMessageContaining("Invalid credentials");
         
         verifyNoInteractions(passwordEncoderPort, tokenProviderPort);
+        
+        System.out.println("✅ TEST PASSED: login_throws_exception_when_user_not_found");
     }
     
     @Test
@@ -208,6 +242,12 @@ class AuthServiceTests {
         User user = MotherObjects.user().build();
         when(loadUserPort.findByUsernameOrEmail(usernameOrEmail)).thenReturn(Optional.of(user));
         when(passwordEncoderPort.matches(password, user.getPasswordHash())).thenReturn(false);
+        
+        System.out.println("✅ TEST: login_throws_exception_when_password_is_incorrect");
+        System.out.println("📝 Username/Email: " + usernameOrEmail);
+        System.out.println("📝 Password: " + password);
+        System.out.println("📝 Expected exception: UnauthorizedActionException");
+        System.out.println("📝 Expected message: Invalid credentials");
         
         // Act & Assert
         LoginUseCase.LoginCommand command = LoginUseCase.LoginCommand.builder()
@@ -221,5 +261,7 @@ class AuthServiceTests {
         
         verify(passwordEncoderPort).matches(password, user.getPasswordHash());
         verifyNoInteractions(tokenProviderPort);
+        
+        System.out.println("✅ TEST PASSED: login_throws_exception_when_password_is_incorrect");
     }
 }
