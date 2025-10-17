@@ -16,17 +16,18 @@ public class AuthDtos {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterRequest {
-        @NotBlank(message = "Username is required")
-        @Size(min = 3, max = 30, message = "Username must be between 3 and 30 characters")
-        @Pattern(regexp = "^[a-zA-Z0-9._]+$", message = "Username can only contain letters, numbers, dots, and underscores")
+        @NotBlank(message = "Le nom d'utilisateur est requis")
+        @Size(min = 3, max = 30, message = "Le nom d'utilisateur doit contenir entre 3 et 30 caractères")
+        @Pattern(regexp = "^[a-zA-Z0-9._]+$", message = "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres, des points et des underscores")
         private String username;
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Email should be valid")
+        @NotBlank(message = "L'email est requis")
+        @Email(message = "L'email doit être valide")
+        @Size(max = 100, message = "L'email ne doit pas dépasser 100 caractères")
         private String email;
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 6, message = "Password must be at least 6 characters")
+        @NotBlank(message = "Le mot de passe est requis")
+        @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
         private String password;
     }
 
@@ -35,10 +36,10 @@ public class AuthDtos {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequest {
-        @NotBlank(message = "Username or email is required")
+        @NotBlank(message = "Le nom d'utilisateur ou l'email est requis")
         private String usernameOrEmail;
 
-        @NotBlank(message = "Password is required")
+        @NotBlank(message = "Le mot de passe est requis")
         private String password;
     }
 

@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,10 +29,15 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProviderPort tokenProvider;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        
+        // Log pour déboguer
+        log.debug("Processing request: {}", request.getRequestURI());
+        
         try {
             String jwt = getJwtFromRequest(request);
 
@@ -69,5 +75,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+    
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        
+        // Ne jamais appliquer le filtre pour les endpoints d'authentification
+        if (path.startsWith("/auth/")) {
+            log.debug("Skipping JWT filter for auth endpoint: {}", path);
+            return true;
+        }
+        
+        // Ne pas appliquer pour d'autres endpoints publics
+        boolean shouldSkip = pathMatcher.match("/swagger-ui/**", path) || 
+                             pathMatcher.match("/v3/api-docs/**", path) || 
+                             pathMatcher.match("/h2-console/**", path);
+        
+        if (shouldSkip) {
+            log.debug("Skipping JWT filter for public endpoint: {}", path);
+        }
+        
+        return shouldSkip;
     }
 }
