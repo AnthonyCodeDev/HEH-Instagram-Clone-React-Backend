@@ -66,6 +66,10 @@ class AuthControllerTests {
                         .userId(userId)
                         .build());
 
+        System.out.println("✅ TEST: register_should_return_201_and_auth_response_when_successful");
+        System.out.println("📝 Expected token: " + token);
+        System.out.println("📝 Expected userId exists: true");
+
         // Act & Assert
         mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -79,6 +83,8 @@ class AuthControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value(token))
                 .andExpect(jsonPath("$.userId").exists());
+                
+        System.out.println("✅ TEST PASSED: register_should_return_201_and_auth_response_when_successful");
     }
 
     @Test
@@ -86,6 +92,10 @@ class AuthControllerTests {
         // Arrange
         when(registerUseCase.register(any(RegisterUseCase.RegisterCommand.class)))
                 .thenThrow(new ValidationException("Username is already taken"));
+
+        System.out.println("✅ TEST: register_should_return_400_when_validation_fails");
+        System.out.println("📝 Expected exception: ValidationException");
+        System.out.println("📝 Expected message: Username is already taken");
 
         // Act & Assert
         try {
@@ -103,6 +113,9 @@ class AuthControllerTests {
             // Vérifie que l'exception est bien une ServletException causée par ValidationException
             org.junit.jupiter.api.Assertions.assertTrue(e.getCause() instanceof ValidationException);
             org.junit.jupiter.api.Assertions.assertEquals("Username is already taken", e.getCause().getMessage());
+            System.out.println("✅ TEST PASSED: register_should_return_400_when_validation_fails");
+            System.out.println("📝 Actual exception: " + e.getCause().getClass().getSimpleName());
+            System.out.println("📝 Actual message: " + e.getCause().getMessage());
         }
     }
 
@@ -121,6 +134,10 @@ class AuthControllerTests {
                         .userId(userId)
                         .build());
 
+        System.out.println("✅ TEST: login_should_return_200_and_auth_response_when_successful");
+        System.out.println("📝 Expected token: " + token);
+        System.out.println("📝 Expected userId exists: true");
+
         // Act & Assert
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -133,5 +150,7 @@ class AuthControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value(token))
                 .andExpect(jsonPath("$.userId").exists());
+                
+        System.out.println("✅ TEST PASSED: login_should_return_200_and_auth_response_when_successful");
     }
 }

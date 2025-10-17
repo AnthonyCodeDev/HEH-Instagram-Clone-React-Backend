@@ -61,6 +61,11 @@ class UserRepositoryAdapterJpaTests {
                 .withEmail("test@example.com")
                 .build();
 
+        System.out.println("✅ TEST: save_and_find_by_id_should_work");
+        System.out.println("📝 Expected userId: " + userId);
+        System.out.println("📝 Expected username: testuser");
+        System.out.println("📝 Expected email: test@example.com");
+
         // Act
         User savedUser = userRepositoryAdapter.save(user);
         Optional<User> foundUser = userRepositoryAdapter.findById(UserId.of(userId));
@@ -70,6 +75,8 @@ class UserRepositoryAdapterJpaTests {
         assertThat(foundUser.get().getId().getValue()).isEqualTo(userId);
         assertThat(foundUser.get().getUsername().toString()).isEqualTo("testuser");
         assertThat(foundUser.get().getEmail().toString()).isEqualTo("test@example.com");
+        
+        System.out.println("✅ TEST PASSED: save_and_find_by_id_should_work");
     }
 
     @Test
@@ -80,6 +87,9 @@ class UserRepositoryAdapterJpaTests {
                 .withUsername(username)
                 .build();
 
+        System.out.println("✅ TEST: find_by_username_should_work");
+        System.out.println("📝 Expected username: " + username);
+
         userRepositoryAdapter.save(user);
 
         // Act
@@ -88,6 +98,8 @@ class UserRepositoryAdapterJpaTests {
         // Assert
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getUsername().toString()).isEqualTo(username);
+        
+        System.out.println("✅ TEST PASSED: find_by_username_should_work");
     }
 
     @Test
@@ -98,6 +110,9 @@ class UserRepositoryAdapterJpaTests {
                 .withEmail(email)
                 .build();
 
+        System.out.println("✅ TEST: find_by_email_should_work");
+        System.out.println("📝 Expected email: " + email);
+
         userRepositoryAdapter.save(user);
 
         // Act
@@ -106,6 +121,8 @@ class UserRepositoryAdapterJpaTests {
         // Assert
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getEmail().toString()).isEqualTo(email);
+        
+        System.out.println("✅ TEST PASSED: find_by_email_should_work");
     }
 
     @Test
@@ -116,6 +133,10 @@ class UserRepositoryAdapterJpaTests {
                 .withUsername(username)
                 .build();
 
+        System.out.println("✅ TEST: exists_by_username_should_return_true_when_username_exists");
+        System.out.println("📝 Expected username: " + username);
+        System.out.println("📝 Expected exists: true");
+
         userRepositoryAdapter.save(user);
 
         // Act
@@ -123,6 +144,8 @@ class UserRepositoryAdapterJpaTests {
 
         // Assert
         assertThat(exists).isTrue();
+        
+        System.out.println("✅ TEST PASSED: exists_by_username_should_return_true_when_username_exists");
     }
 
     @Test
@@ -133,6 +156,10 @@ class UserRepositoryAdapterJpaTests {
                 .withEmail(email)
                 .build();
 
+        System.out.println("✅ TEST: exists_by_email_should_return_true_when_email_exists");
+        System.out.println("📝 Expected email: " + email);
+        System.out.println("📝 Expected exists: true");
+
         userRepositoryAdapter.save(user);
 
         // Act
@@ -140,6 +167,8 @@ class UserRepositoryAdapterJpaTests {
 
         // Assert
         assertThat(exists).isTrue();
+        
+        System.out.println("✅ TEST PASSED: exists_by_email_should_return_true_when_email_exists");
     }
 
     @Test
@@ -152,11 +181,17 @@ class UserRepositoryAdapterJpaTests {
 
         User savedUser = userRepositoryAdapter.save(user);
 
+        System.out.println("✅ TEST: delete_should_remove_user");
+        System.out.println("📝 User ID to delete: " + userId);
+        System.out.println("📝 Expected result: user not found after deletion");
+
         // Act
         userRepositoryAdapter.delete(savedUser);
         Optional<User> foundUser = userRepositoryAdapter.findById(UserId.of(userId));
 
         // Assert
         assertThat(foundUser).isEmpty();
+        
+        System.out.println("✅ TEST PASSED: delete_should_remove_user");
     }
 }
