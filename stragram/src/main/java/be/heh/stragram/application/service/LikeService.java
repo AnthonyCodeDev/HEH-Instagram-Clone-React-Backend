@@ -49,9 +49,8 @@ public class LikeService implements LikePostUseCase, UnlikePostUseCase {
         Like like = Like.create(postId, userId);
         Like savedLike = likePostPort.save(like);
 
-        // Update post like count
-        post.incrementLikeCount();
-        savePostPort.save(post);
+        // Nous n'avons plus besoin de mettre à jour le compteur de likes
+        // car il est maintenant calculé à la demande
 
         // Create notification if the user is not the post owner
         if (!post.getAuthorId().equals(userId)) {
@@ -95,8 +94,7 @@ public class LikeService implements LikePostUseCase, UnlikePostUseCase {
         // Delete like
         likePostPort.delete(postId, userId);
 
-        // Update post like count
-        post.decrementLikeCount();
-        savePostPort.save(post);
+        // Nous n'avons plus besoin de mettre à jour le compteur de likes
+        // car il est maintenant calculé à la demande
     }
 }

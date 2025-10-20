@@ -17,7 +17,7 @@ CREATE TABLE users (
 CREATE TABLE posts (
     id UUID PRIMARY KEY,
     author_id UUID NOT NULL,
-    image_path VARCHAR(255),
+    image_path VARCHAR(255) NOT NULL,
     description VARCHAR(2000),
     like_count INT NOT NULL DEFAULT 0,
     comment_count INT NOT NULL DEFAULT 0,

@@ -6,10 +6,7 @@ import be.heh.stragram.application.domain.model.Like;
 import be.heh.stragram.application.domain.model.Post;
 import be.heh.stragram.application.domain.model.User;
 import be.heh.stragram.application.domain.value.UserId;
-import be.heh.stragram.application.port.out.FavoritePostPort;
-import be.heh.stragram.application.port.out.ImageStoragePort;
-import be.heh.stragram.application.port.out.LikePostPort;
-import be.heh.stragram.application.port.out.LoadUserPort;
+import be.heh.stragram.application.port.out.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +18,7 @@ public class PostWebMapper {
     private final LikePostPort likePostPort;
     private final FavoritePostPort favoritePostPort;
     private final ImageStoragePort imageStoragePort;
+    private final LoadCommentsPort loadCommentsPort;
 
     public PostDtos.PostResponse toPostResponse(Post post, UserId currentUserId) {
         User author = loadUserPort.findById(post.getAuthorId())
@@ -32,8 +30,15 @@ public class PostWebMapper {
         if (currentUserId != null) {
             isLiked = likePostPort.exists(post.getId(), currentUserId);
             isFavorited = favoritePostPort.exists(post.getId(), currentUserId);
+            System.out.println("Checking likes for post " + post.getId() + " and user " + currentUserId + ": isLiked=" + isLiked);
+        } else {
+            System.out.println("User not authenticated when checking post " + post.getId());
         }
 
+        // Calculer les compteurs à la demande
+        int likeCount = likePostPort.countByPostId(post.getId());
+        int commentCount = loadCommentsPort.countByPostId(post.getId());
+        
         return PostDtos.PostResponse.builder()
                 .id(post.getId().toString())
                 .authorId(author.getId().toString())
@@ -41,8 +46,8 @@ public class PostWebMapper {
                 .authorAvatarUrl(author.getAvatarUrl())
                 .imageUrl(post.getImagePath() != null ? imageStoragePort.getImageUrl(post.getImagePath()) : null)
                 .description(post.getDescription())
-                .likeCount(post.getLikeCount())
-                .commentCount(post.getCommentCount())
+                .likeCount(likeCount)
+                .commentCount(commentCount)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .isLikedByCurrentUser(isLiked)

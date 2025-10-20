@@ -116,5 +116,11 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
     
-    // La méthode getRecentPosts a été déplacée vers RecentPostsController
+    // Redirection vers le nouveau contrôleur RecentPostsController
+    @GetMapping("/recent")
+    public ResponseEntity<Void> redirectToRecentPosts() {
+        return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
+                .header("Location", "/recent-posts")
+                .build();
+    }
 }

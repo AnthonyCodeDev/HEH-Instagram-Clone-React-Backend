@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface SpringDataCommentRepository extends JpaRepository<CommentJpaEntity, UUID> {
     
     Page<CommentJpaEntity> findByPostIdOrderByCreatedAtAsc(UUID postId, Pageable pageable);
+    
+    int countByPostId(UUID postId);
 }

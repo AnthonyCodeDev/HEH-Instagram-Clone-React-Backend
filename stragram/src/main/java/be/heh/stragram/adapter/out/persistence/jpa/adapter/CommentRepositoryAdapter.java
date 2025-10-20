@@ -37,6 +37,11 @@ public class CommentRepositoryAdapter implements LoadCommentsPort, SaveCommentPo
                 .map(commentMapper::toDomain)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public int countByPostId(PostId postId) {
+        return commentRepository.countByPostId(postId.getValue());
+    }
 
     @Override
     public Comment save(Comment comment) {
