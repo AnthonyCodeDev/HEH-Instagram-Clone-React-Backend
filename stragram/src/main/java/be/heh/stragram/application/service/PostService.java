@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService implements CreatePostUseCase, GetPostQuery, ListUserPostsQuery, 
-        UpdatePostUseCase, DeletePostUseCase {
+        UpdatePostUseCase, DeletePostUseCase, ListRecentPostsQuery {
 
     private final LoadPostPort loadPostPort;
     private final SavePostPort savePostPort;
@@ -34,12 +34,15 @@ public class PostService implements CreatePostUseCase, GetPostQuery, ListUserPos
         User author = loadUserPort.findById(command.getAuthorId())
                 .orElseThrow(() -> new NotFoundException("User", command.getAuthorId().toString()));
 
-        // Store image
-        String imagePath = imageStoragePort.store(
-                command.getImageFile(),
-                command.getOriginalFilename(),
-                command.getContentType()
-        );
+        // Store image si présente
+        String imagePath = null;
+        if (command.getImageFile() != null) {
+            imagePath = imageStoragePort.store(
+                    command.getImageFile(),
+                    command.getOriginalFilename(),
+                    command.getContentType()
+            );
+        }
 
         // Create post
         Post post = Post.create(
@@ -105,10 +108,19 @@ public class PostService implements CreatePostUseCase, GetPostQuery, ListUserPos
             throw new UnauthorizedActionException("You don't have permission to delete this post");
         }
 
-        // Delete image
-        imageStoragePort.delete(post.getImagePath());
+        // Delete image if exists
+        if (post.getImagePath() != null) {
+            imageStoragePort.delete(post.getImagePath());
+        }
         
         // Delete post
         deletePostPort.delete(post);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Post> listRecentPosts(int page, int size, UserId currentUserId) {
+        // Récupérer les posts récents
+        return loadPostPort.findRecentPosts(page, size);
     }
 }

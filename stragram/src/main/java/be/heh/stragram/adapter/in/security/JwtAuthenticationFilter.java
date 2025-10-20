@@ -90,7 +90,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Ne pas appliquer pour d'autres endpoints publics
         boolean shouldSkip = pathMatcher.match("/swagger-ui/**", path) || 
                              pathMatcher.match("/v3/api-docs/**", path) || 
-                             pathMatcher.match("/h2-console/**", path);
+                             pathMatcher.match("/h2-console/**", path) ||
+                             pathMatcher.match("/images/**", path) ||
+                             pathMatcher.match("/recent-posts", path);
         
         if (shouldSkip) {
             log.debug("Skipping JWT filter for public endpoint: {}", path);

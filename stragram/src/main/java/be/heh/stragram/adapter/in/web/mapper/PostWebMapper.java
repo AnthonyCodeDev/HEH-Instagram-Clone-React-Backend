@@ -39,7 +39,7 @@ public class PostWebMapper {
                 .authorId(author.getId().toString())
                 .authorUsername(author.getUsername().toString())
                 .authorAvatarUrl(author.getAvatarUrl())
-                .imageUrl(imageStoragePort.getImageUrl(post.getImagePath()))
+                .imageUrl(post.getImagePath() != null ? imageStoragePort.getImageUrl(post.getImagePath()) : null)
                 .description(post.getDescription())
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())

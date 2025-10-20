@@ -14,4 +14,6 @@ public interface LoadPostPort {
     List<Post> findByAuthorId(UserId authorId, int page, int size);
     
     List<Post> findByUserFeed(UserId userId, int page, int size);
+    
+    List<Post> findRecentPosts(int page, int size);
 }
