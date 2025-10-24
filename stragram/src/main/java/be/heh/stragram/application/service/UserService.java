@@ -22,8 +22,11 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements GetUserProfileQuery, UpdateUserProfileCommand, DeleteUserCommand, 
-        SearchUsersQuery, FollowUserUseCase, UnfollowUserUseCase {
+public class UserService implements GetUserProfileQuery, UpdateUserProfileCommand, DeleteUserCommand,
+    SearchUsersQuery, FollowUserUseCase, UnfollowUserUseCase, be.heh.stragram.application.port.in.ListRandomUsersQuery {
+
+    // Also implement random listing
+    // Will delegate to SearchUsersPort.findRandomUsers
 
     private final LoadUserPort loadUserPort;
     private final SaveUserPort saveUserPort;
@@ -31,6 +34,7 @@ public class UserService implements GetUserProfileQuery, UpdateUserProfileComman
     private final FollowPort followPort;
     private final NotificationPort notificationPort;
     private final FollowDomainService followDomainService;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -98,6 +102,16 @@ public class UserService implements GetUserProfileQuery, UpdateUserProfileComman
         }
         
         return searchUsersPort.searchByUsernameOrBio(query.trim(), page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> listRandomUsers(int size) {
+        if (size <= 0) {
+            return java.util.Collections.emptyList();
+        }
+
+        return searchUsersPort.findRandomUsers(size);
     }
 
     @Override

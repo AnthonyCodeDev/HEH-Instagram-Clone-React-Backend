@@ -76,4 +76,12 @@ public class UserRepositoryAdapter implements LoadUserPort, SaveUserPort, Search
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<User> findRandomUsers(int size) {
+        return userRepository.findRandomUsers(size)
+                .stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

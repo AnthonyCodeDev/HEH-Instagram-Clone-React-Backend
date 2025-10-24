@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -28,4 +29,7 @@ public interface SpringDataUserRepository extends JpaRepository<UserJpaEntity, U
             "LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(u.bio) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<UserJpaEntity> searchByUsernameOrBio(String query, Pageable pageable);
+
+    @Query(value = "SELECT * FROM users ORDER BY RANDOM() LIMIT :size", nativeQuery = true)
+    java.util.List<UserJpaEntity> findRandomUsers(@Param("size") int size);
 }

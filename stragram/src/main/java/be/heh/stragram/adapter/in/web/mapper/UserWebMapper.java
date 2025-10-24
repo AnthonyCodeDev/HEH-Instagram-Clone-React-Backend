@@ -1,6 +1,7 @@
 package be.heh.stragram.adapter.in.web.mapper;
 
 import be.heh.stragram.adapter.in.web.dto.UserDtos;
+import be.heh.stragram.adapter.in.web.dto.RandomUserDtos;
 import be.heh.stragram.application.domain.model.User;
 import be.heh.stragram.application.domain.model.follow.FollowRelationship;
 import be.heh.stragram.application.domain.value.UserId;
@@ -54,6 +55,17 @@ public class UserWebMapper {
                 .followerId(followRelationship.getFollowerId().toString())
                 .followingId(followRelationship.getFollowingId().toString())
                 .createdAt(followRelationship.getCreatedAt())
+                .build();
+    }
+
+    public RandomUserDtos.RandomUserResponse toRandomUserResponse(User user) {
+        // Use username as display name if no separate name field exists
+        return RandomUserDtos.RandomUserResponse.builder()
+                .id(user.getId().toString())
+                .name(user.getUsername().toString())
+                .username(user.getUsername().toString())
+                .avatarUrl(user.getAvatarUrl())
+                .bannerUrl(null) // banner not present in domain model yet
                 .build();
     }
 }
