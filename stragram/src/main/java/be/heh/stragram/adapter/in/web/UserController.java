@@ -103,6 +103,11 @@ public class UserController {
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal UserId currentUserId) {
         
+        // Require authentication
+        if (currentUserId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        
         List<User> users = searchUsersQuery.search(query, page, size);
         
         List<UserDtos.SearchUserResponseItem> userItems = users.stream()
