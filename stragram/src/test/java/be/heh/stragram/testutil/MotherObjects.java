@@ -114,8 +114,6 @@ public final class MotherObjects {
         private UserId authorId = UserId.of(UUID.randomUUID());
         private String imagePath = "image.jpg";
         private String description = "Test description";
-        private int likeCount = 0;
-        private int commentCount = 0;
         private Instant createdAt = DEFAULT_TIME;
         private Instant updatedAt = DEFAULT_TIME;
         
@@ -139,24 +137,12 @@ public final class MotherObjects {
             return this;
         }
         
-        public PostBuilder withLikeCount(int likeCount) {
-            this.likeCount = likeCount;
-            return this;
-        }
-        
-        public PostBuilder withCommentCount(int commentCount) {
-            this.commentCount = commentCount;
-            return this;
-        }
-        
         public Post build() {
             return Post.reconstitute(
                 id,
                 authorId,
                 imagePath,
                 description,
-                likeCount,
-                commentCount,
                 createdAt,
                 updatedAt
             );
