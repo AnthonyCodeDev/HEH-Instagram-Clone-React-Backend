@@ -1,6 +1,7 @@
 package be.heh.stragram.adapter.in.web;
 
 import be.heh.stragram.adapter.in.web.dto.UserDtos;
+import be.heh.stragram.adapter.in.web.dto.RandomUserDtos;
 import be.heh.stragram.adapter.in.web.mapper.UserWebMapper;
 import be.heh.stragram.application.domain.model.User;
 import be.heh.stragram.application.domain.model.follow.FollowRelationship;
@@ -24,6 +25,7 @@ public class UserController {
     private final UpdateUserProfileCommand updateUserProfileCommand;
     private final DeleteUserCommand deleteUserCommand;
     private final SearchUsersQuery searchUsersQuery;
+    private final be.heh.stragram.application.port.in.ListRandomUsersQuery listRandomUsersQuery;
     private final FollowUserUseCase followUserUseCase;
     private final UnfollowUserUseCase unfollowUserUseCase;
     private final UserWebMapper userWebMapper;
@@ -32,7 +34,17 @@ public class UserController {
     public ResponseEntity<UserDtos.UserResponse> getUserProfile(
             @PathVariable String id,
             @AuthenticationPrincipal UserId currentUserId) {
-        
+        // Support the special "me" identifier: return the profile of the current authenticated user
+        if ("me".equalsIgnoreCase(id)) {
+            if (currentUserId == null) {
+                return ResponseEntity.status(401).build();
+            }
+
+            User user = getUserProfileQuery.getUserById(currentUserId);
+            return ResponseEntity.ok(userWebMapper.toUserResponse(user, currentUserId));
+        }
+
+        // Otherwise expect a UUID-like user id in the path
         User user = getUserProfileQuery.getUserById(UserId.fromString(id));
         return ResponseEntity.ok(userWebMapper.toUserResponse(user, currentUserId));
     }
@@ -91,6 +103,11 @@ public class UserController {
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal UserId currentUserId) {
         
+        // Require authentication
+        if (currentUserId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        
         List<User> users = searchUsersQuery.search(query, page, size);
         
         List<UserDtos.SearchUserResponseItem> userItems = users.stream()
@@ -121,6 +138,42 @@ public class UserController {
 
         FollowRelationship followRelationship = followUserUseCase.follow(currentUserId, targetId);
         return ResponseEntity.ok(userWebMapper.toFollowResponse(followRelationship));
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<RandomUserDtos.RandomUserListResponse> getRandomUsers(
+        @RequestParam(defaultValue = "6") int size,
+        @AuthenticationPrincipal UserId currentUserId) {
+
+        if (size <= 0) size = 6;
+        if (size > 50) size = 50; // safety cap
+
+        // If user is authenticated, request one extra and filter them out afterwards so we still
+        // return `size` other users whenever possible.
+        int fetchSize = size;
+        if (currentUserId != null) {
+            fetchSize = Math.min(size + 1, 50);
+        }
+
+        java.util.List<be.heh.stragram.application.domain.model.User> users = listRandomUsersQuery.listRandomUsers(fetchSize);
+
+        // Exclude current user if present
+        java.util.stream.Stream<be.heh.stragram.application.domain.model.User> stream = users.stream();
+        if (currentUserId != null) {
+            stream = stream.filter(u -> !u.getId().equals(currentUserId));
+        }
+
+        java.util.List<RandomUserDtos.RandomUserResponse> items = stream
+            .map(userWebMapper::toRandomUserResponse)
+            .limit(size)
+            .collect(java.util.stream.Collectors.toList());
+
+        RandomUserDtos.RandomUserListResponse response = RandomUserDtos.RandomUserListResponse.builder()
+            .users(items)
+            .size(items.size())
+            .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}/follow")

@@ -19,12 +19,6 @@ public class Post {
     @Setter(AccessLevel.PACKAGE)
     private String description;
     
-    @Setter(AccessLevel.PACKAGE)
-    private int likeCount;
-    
-    @Setter(AccessLevel.PACKAGE)
-    private int commentCount;
-    
     private final Instant createdAt;
     
     @Setter(AccessLevel.PACKAGE)
@@ -35,8 +29,6 @@ public class Post {
             UserId authorId,
             String imagePath,
             String description,
-            int likeCount,
-            int commentCount,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -44,8 +36,6 @@ public class Post {
         this.authorId = authorId;
         this.imagePath = imagePath;
         this.description = description;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -62,8 +52,6 @@ public class Post {
                 authorId,
                 imagePath,
                 description,
-                0,
-                0,
                 Instant.now(),
                 Instant.now()
         );
@@ -74,8 +62,6 @@ public class Post {
             UserId authorId,
             String imagePath,
             String description,
-            int likeCount,
-            int commentCount,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -84,8 +70,6 @@ public class Post {
                 authorId,
                 imagePath,
                 description,
-                likeCount,
-                commentCount,
                 createdAt,
                 updatedAt
         );
@@ -101,29 +85,7 @@ public class Post {
         this.updatedAt = Instant.now();
     }
 
-    public void incrementLikeCount() {
-        this.likeCount++;
-        this.updatedAt = Instant.now();
-    }
-
-    public void decrementLikeCount() {
-        if (this.likeCount > 0) {
-            this.likeCount--;
-            this.updatedAt = Instant.now();
-        }
-    }
-
-    public void incrementCommentCount() {
-        this.commentCount++;
-        this.updatedAt = Instant.now();
-    }
-
-    public void decrementCommentCount() {
-        if (this.commentCount > 0) {
-            this.commentCount--;
-            this.updatedAt = Instant.now();
-        }
-    }
+    // Ces méthodes ne sont plus nécessaires car nous calculons les compteurs à la demande
 
     public boolean canBeDeletedBy(UserId userId, boolean isAdmin) {
         return this.authorId.equals(userId) || isAdmin;

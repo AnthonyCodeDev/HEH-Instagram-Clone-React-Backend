@@ -15,4 +15,6 @@ public interface SpringDataLikeRepository extends JpaRepository<LikeJpaEntity, L
     boolean existsById_PostIdAndId_UserId(UUID postId, UUID userId);
     
     void deleteById_PostIdAndId_UserId(UUID postId, UUID userId);
+    
+    int countById_PostId(UUID postId);
 }

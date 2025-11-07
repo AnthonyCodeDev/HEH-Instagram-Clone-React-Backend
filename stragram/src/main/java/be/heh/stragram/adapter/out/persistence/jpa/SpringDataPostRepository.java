@@ -19,4 +19,6 @@ public interface SpringDataPostRepository extends JpaRepository<PostJpaEntity, U
             "(SELECT f.id.followingId FROM FollowRelationshipJpaEntity f WHERE f.id.followerId = :userId) " +
             "ORDER BY p.createdAt DESC")
     Page<PostJpaEntity> findFeedPostsForUser(UUID userId, Pageable pageable);
+    
+    Page<PostJpaEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

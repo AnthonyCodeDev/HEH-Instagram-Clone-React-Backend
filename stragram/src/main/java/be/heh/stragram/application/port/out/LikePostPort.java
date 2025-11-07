@@ -15,4 +15,6 @@ public interface LikePostPort {
     boolean exists(PostId postId, UserId userId);
     
     Optional<Like> findByPostIdAndUserId(PostId postId, UserId userId);
+    
+    int countByPostId(PostId postId);
 }

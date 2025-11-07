@@ -54,13 +54,16 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
                 // Swagger/OpenAPI endpoints
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs.yaml", "/webjars/**").permitAll()
                 // H2 Console
                 .requestMatchers("/h2-console/**").permitAll()
+                // Images endpoint - accès public
+                .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                 // Public GET endpoints
                 .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/search").permitAll()
                 .requestMatchers(HttpMethod.GET, "/posts/{id}", "/posts/user/{userId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/posts/{id}/comments").permitAll()
+                .requestMatchers(HttpMethod.GET, "/recent-posts").permitAll()
                 // Admin endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // All other endpoints require authentication

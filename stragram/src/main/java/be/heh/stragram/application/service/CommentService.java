@@ -50,9 +50,8 @@ public class CommentService implements AddCommentUseCase, EditCommentUseCase,
         Comment comment = Comment.create(postId, authorId, command.getText());
         Comment savedComment = saveCommentPort.save(comment);
 
-        // Update post comment count
-        post.incrementCommentCount();
-        savePostPort.save(post);
+        // Nous n'avons plus besoin de mettre à jour le compteur de commentaires
+        // car il est maintenant calculé à la demande
 
         // Create notification if the author is not the post owner
         if (!post.getAuthorId().equals(authorId)) {
@@ -102,12 +101,8 @@ public class CommentService implements AddCommentUseCase, EditCommentUseCase,
             throw new UnauthorizedActionException("You don't have permission to delete this comment");
         }
 
-        // Update post comment count
-        Post post = loadPostPort.findById(comment.getPostId())
-                .orElseThrow(() -> new NotFoundException("Post", comment.getPostId().toString()));
-        
-        post.decrementCommentCount();
-        savePostPort.save(post);
+        // Nous n'avons plus besoin de mettre à jour le compteur de commentaires
+        // car il est maintenant calculé à la demande
 
         // Delete comment
         deleteCommentPort.delete(comment);

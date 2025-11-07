@@ -33,18 +33,24 @@ public class PostController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostDtos.PostResponse> createPost(
-            @RequestParam("image") MultipartFile image,
+            @RequestParam(value = "image", required = false) MultipartFile image,
             @RequestParam(value = "description", required = false) String description,
             @AuthenticationPrincipal UserId currentUserId) {
         
         try {
-            Post post = createPostUseCase.create(CreatePostUseCase.CreatePostCommand.builder()
+            CreatePostUseCase.CreatePostCommand.CreatePostCommandBuilder commandBuilder = CreatePostUseCase.CreatePostCommand.builder()
                     .authorId(currentUserId)
+                    .description(description);
+            
+            // Ajouter l'image seulement si elle est présente
+            if (image != null && !image.isEmpty()) {
+                commandBuilder
                     .imageFile(image.getInputStream())
                     .originalFilename(image.getOriginalFilename())
-                    .contentType(image.getContentType())
-                    .description(description)
-                    .build());
+                    .contentType(image.getContentType());
+            }
+            
+            Post post = createPostUseCase.create(commandBuilder.build());
 
             return new ResponseEntity<>(postWebMapper.toPostResponse(post, currentUserId), HttpStatus.CREATED);
         } catch (IOException e) {
@@ -52,7 +58,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PostDtos.PostResponse> getPost(
             @PathVariable String id,
             @AuthenticationPrincipal UserId currentUserId) {
@@ -108,5 +114,13 @@ public class PostController {
         
         deletePostUseCase.delete(PostId.fromString(id), currentUserId);
         return ResponseEntity.noContent().build();
+    }
+    
+    // Redirection vers le nouveau contrôleur RecentPostsController
+    @GetMapping("/recent")
+    public ResponseEntity<Void> redirectToRecentPosts() {
+        return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
+                .header("Location", "/recent-posts")
+                .build();
     }
 }

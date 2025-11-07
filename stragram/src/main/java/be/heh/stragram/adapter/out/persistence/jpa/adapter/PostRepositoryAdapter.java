@@ -46,6 +46,15 @@ public class PostRepositoryAdapter implements LoadPostPort, SavePostPort, Delete
                 .map(postMapper::toDomain)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public List<Post> findRecentPosts(int page, int size) {
+        return postRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size))
+                .getContent()
+                .stream()
+                .map(postMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Post save(Post post) {

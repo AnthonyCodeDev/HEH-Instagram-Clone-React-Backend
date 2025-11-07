@@ -42,4 +42,9 @@ public class LikeRepositoryAdapter implements LikePostPort {
         return likeRepository.findById_PostIdAndId_UserId(postId.getValue(), userId.getValue())
                 .map(likeMapper::toDomain);
     }
+    
+    @Override
+    public int countByPostId(PostId postId) {
+        return likeRepository.countById_PostId(postId.getValue());
+    }
 }

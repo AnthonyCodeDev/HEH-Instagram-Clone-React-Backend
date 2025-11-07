@@ -12,4 +12,6 @@ public interface LoadCommentsPort {
     Optional<Comment> findById(CommentId id);
     
     List<Comment> findByPostId(PostId postId, int page, int size);
+    
+    int countByPostId(PostId postId);
 }

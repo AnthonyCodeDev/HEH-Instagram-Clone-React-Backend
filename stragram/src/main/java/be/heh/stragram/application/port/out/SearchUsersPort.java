@@ -7,4 +7,6 @@ import java.util.List;
 public interface SearchUsersPort {
     
     List<User> searchByUsernameOrBio(String query, int page, int size);
+
+    List<User> findRandomUsers(int size);
 }

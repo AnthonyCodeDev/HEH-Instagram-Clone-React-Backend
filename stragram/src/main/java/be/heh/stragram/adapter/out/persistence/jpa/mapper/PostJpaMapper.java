@@ -15,8 +15,6 @@ public class PostJpaMapper {
                 UserId.of(entity.getAuthorId()),
                 entity.getImagePath(),
                 entity.getDescription(),
-                entity.getLikeCount(),
-                entity.getCommentCount(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
@@ -28,8 +26,6 @@ public class PostJpaMapper {
                 .authorId(domain.getAuthorId().getValue())
                 .imagePath(domain.getImagePath())
                 .description(domain.getDescription())
-                .likeCount(domain.getLikeCount())
-                .commentCount(domain.getCommentCount())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
                 .build();

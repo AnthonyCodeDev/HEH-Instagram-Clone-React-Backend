@@ -30,11 +30,7 @@ public class PostJpaEntity {
     @Column(name = "description", length = 2000)
     private String description;
 
-    @Column(name = "like_count", nullable = false)
-    private int likeCount;
-
-    @Column(name = "comment_count", nullable = false)
-    private int commentCount;
+    // like_count et comment_count ont été supprimés
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
