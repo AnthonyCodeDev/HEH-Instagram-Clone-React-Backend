@@ -1,5 +1,6 @@
 package be.heh.stragram.application.service;
 
+import be.heh.stragram.adapter.in.websocket.dto.ConversationDeletedNotification;
 import be.heh.stragram.application.domain.model.Conversation;
 import be.heh.stragram.application.domain.model.Message;
 import be.heh.stragram.application.domain.model.User;
@@ -8,6 +9,7 @@ import be.heh.stragram.application.domain.value.MessageId;
 import be.heh.stragram.application.domain.value.UserId;
 import be.heh.stragram.application.port.out.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class MessageService {
     private final SaveConversationPort saveConversationPort;
     private final DeleteConversationPort deleteConversationPort;
     private final LoadUserPort loadUserPort;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public Message sendMessage(UserId senderId, UserId receiverId, String content) {
@@ -40,6 +43,14 @@ public class MessageService {
                     Conversation newConversation = Conversation.create(Set.of(senderId, receiverId));
                     return saveConversationPort.save(newConversation);
                 });
+
+        // Si la conversation était supprimée par un des participants, la restaurer
+        if (conversation.isDeletedBy(senderId)) {
+            conversation.restoreFor(senderId);
+        }
+        if (conversation.isDeletedBy(receiverId)) {
+            conversation.restoreFor(receiverId);
+        }
 
         // Créer et sauvegarder le message
         Message message = Message.create(conversation.getId(), senderId, content);
@@ -67,7 +78,9 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public List<Conversation> getUserConversations(UserId userId) {
-        return loadConversationsPort.findByParticipantId(userId);
+        return loadConversationsPort.findByParticipantId(userId).stream()
+                .filter(conversation -> !conversation.isDeletedBy(userId))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional
@@ -137,7 +150,10 @@ public class MessageService {
             throw new IllegalArgumentException("User is not part of this conversation");
         }
 
-        // Supprimer la conversation (cascade supprimera aussi les messages)
-        deleteConversationPort.delete(conversationId);
+        // Marquer la conversation comme supprimée pour cet utilisateur (soft delete)
+        conversation.markAsDeletedBy(userId);
+        
+        // Sauvegarder les changements
+        saveConversationPort.save(conversation);
     }
 }
