@@ -21,12 +21,24 @@ public class UserWebMapper {
             isFollowing = followPort.exists(currentUserId, user.getId());
         }
 
+        // Build social links map
+        java.util.Map<String, String> socialLinks = new java.util.HashMap<>();
+        if (user.getTiktok() != null) socialLinks.put("tiktok", user.getTiktok());
+        if (user.getTwitter() != null) socialLinks.put("twitter", user.getTwitter());
+        if (user.getYoutube() != null) socialLinks.put("youtube", user.getYoutube());
+
         return UserDtos.UserResponse.builder()
                 .id(user.getId().toString())
                 .username(user.getUsername().toString())
+                .name(user.getName())
                 .email(user.getEmail().toString())
                 .bio(user.getBio())
                 .avatarUrl(user.getAvatarUrl())
+                .bannerUrl(user.getBannerUrl())
+                .phone(user.getPhone())
+                .location(user.getLocation())
+                .birthdate(user.getBirthdate() != null ? user.getBirthdate().toString() : null)
+                .socialLinks(socialLinks)
                 .followersCount(user.getFollowersCount())
                 .followingCount(user.getFollowingCount())
                 .createdAt(user.getCreatedAt())
@@ -59,13 +71,14 @@ public class UserWebMapper {
     }
 
     public RandomUserDtos.RandomUserResponse toRandomUserResponse(User user) {
-        // Use username as display name if no separate name field exists
+        // Use name if available, otherwise fallback to username
+        String displayName = user.getName() != null ? user.getName() : user.getUsername().toString();
         return RandomUserDtos.RandomUserResponse.builder()
                 .id(user.getId().toString())
-                .name(user.getUsername().toString())
+                .name(displayName)
                 .username(user.getUsername().toString())
                 .avatarUrl(user.getAvatarUrl())
-                .bannerUrl(null) // banner not present in domain model yet
+                .bannerUrl(user.getBannerUrl())
                 .build();
     }
 }

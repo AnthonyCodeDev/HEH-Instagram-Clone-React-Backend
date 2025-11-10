@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 public class UserDtos {
 
@@ -21,9 +22,15 @@ public class UserDtos {
     public static class UserResponse {
         private String id;
         private String username;
+        private String name;
         private String email;
         private String bio;
         private String avatarUrl;
+        private String bannerUrl;
+        private String phone;
+        private String location;
+        private String birthdate;       // format: YYYY-MM-DD
+        private Map<String, String> socialLinks;
         private int followersCount;
         private int followingCount;
         private Instant createdAt;
@@ -48,6 +55,27 @@ public class UserDtos {
         private String bio;
 
         private String avatarUrl;
+        private String name;
+        private String bannerUrl;
+        @Size(max = 30, message = "Phone cannot exceed 30 characters")
+        private String phone;
+        @Size(max = 100, message = "Location cannot exceed 100 characters")
+        private String location;
+        private String birthdate;       // format: YYYY-MM-DD
+        private Map<String, String> socialLinks;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChangePasswordRequest {
+        @NotBlank(message = "Current password is required")
+        private String currentPassword;
+
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        private String newPassword;
     }
 
     @Data

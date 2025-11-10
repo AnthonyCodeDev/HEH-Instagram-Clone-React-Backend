@@ -59,8 +59,9 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 // Images endpoint - accès public
                 .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
-                // Public GET endpoints
-                .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/search").permitAll()
+                // Public GET endpoints for users
+                .requestMatchers(HttpMethod.GET, "/users/{id}", "/users/username/{username}", "/users/search", "/users/random").permitAll()
+                // Public GET endpoints for posts
                 .requestMatchers(HttpMethod.GET, "/posts/{id}", "/posts/user/{userId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/posts/{id}/comments").permitAll()
                 .requestMatchers(HttpMethod.GET, "/recent-posts").permitAll()

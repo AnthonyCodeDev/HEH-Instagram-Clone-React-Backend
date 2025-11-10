@@ -11,6 +11,7 @@ import be.heh.stragram.application.domain.value.Username;
 import be.heh.stragram.application.domain.value.PasswordHash;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public final class MotherObjects {
@@ -82,6 +83,60 @@ public final class MotherObjects {
             return this;
         }
         
+        private String name = null;
+        private String bannerUrl = null;
+        private String phone = null;
+        private String location = null;
+        private LocalDate birthdate = null;
+        private String tiktok = null;
+        private String twitter = null;
+        private String youtube = null;
+
+        public UserBuilder withUserId(UserId userId) {
+            this.id = userId;
+            return this;
+        }
+        
+        public UserBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+        
+        public UserBuilder withBannerUrl(String bannerUrl) {
+            this.bannerUrl = bannerUrl;
+            return this;
+        }
+        
+        public UserBuilder withPhone(String phone) {
+            this.phone = phone;
+            return this;
+        }
+        
+        public UserBuilder withLocation(String location) {
+            this.location = location;
+            return this;
+        }
+        
+        public UserBuilder withBirthdate(LocalDate birthdate) {
+            this.birthdate = birthdate;
+            return this;
+        }
+        
+        public UserBuilder withTiktok(String tiktok) {
+            this.tiktok = tiktok;
+            return this;
+        }
+        
+        public UserBuilder withTwitter(String twitter) {
+            this.twitter = twitter;
+            return this;
+        }
+        
+        public UserBuilder withYoutube(String youtube) {
+            this.youtube = youtube;
+            return this;
+        }
+        
         public UserBuilder withRole(User.Role role) {
             this.role = role;
             return this;
@@ -100,6 +155,14 @@ public final class MotherObjects {
                 PasswordHash.of(passwordHash),
                 bio,
                 avatarUrl,
+                name,
+                bannerUrl,
+                phone,
+                location,
+                birthdate,
+                tiktok,
+                twitter,
+                youtube,
                 followersCount,
                 followingCount,
                 createdAt,
