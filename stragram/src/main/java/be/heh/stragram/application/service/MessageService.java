@@ -44,14 +44,6 @@ public class MessageService {
                     return saveConversationPort.save(newConversation);
                 });
 
-        // Si la conversation était supprimée par un des participants, la restaurer
-        if (conversation.isDeletedBy(senderId)) {
-            conversation.restoreFor(senderId);
-        }
-        if (conversation.isDeletedBy(receiverId)) {
-            conversation.restoreFor(receiverId);
-        }
-
         // Créer et sauvegarder le message
         Message message = Message.create(conversation.getId(), senderId, content);
         Message savedMessage = saveMessagePort.save(message);
@@ -78,9 +70,7 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public List<Conversation> getUserConversations(UserId userId) {
-        return loadConversationsPort.findByParticipantId(userId).stream()
-                .filter(conversation -> !conversation.isDeletedBy(userId))
-                .collect(java.util.stream.Collectors.toList());
+        return loadConversationsPort.findByParticipantId(userId);
     }
 
     @Transactional
@@ -150,10 +140,22 @@ public class MessageService {
             throw new IllegalArgumentException("User is not part of this conversation");
         }
 
-        // Marquer la conversation comme supprimée pour cet utilisateur (soft delete)
-        conversation.markAsDeletedBy(userId);
-        
-        // Sauvegarder les changements
-        saveConversationPort.save(conversation);
+        // Récupérer l'autre participant pour lui envoyer la notification
+        UserId otherParticipantId = conversation.getOtherParticipant(userId);
+
+        // Supprimer la conversation (cascade supprimera aussi les messages)
+        deleteConversationPort.delete(conversationId);
+
+        // Envoyer notification WebSocket à l'autre participant
+        ConversationDeletedNotification notification = ConversationDeletedNotification.builder()
+                .conversationId(conversationId.getValue())
+                .deletedBy(userId.getValue())
+                .build();
+
+        messagingTemplate.convertAndSendToUser(
+                otherParticipantId.toString(),
+                "/queue/conversation-deleted",
+                notification
+        );
     }
 }

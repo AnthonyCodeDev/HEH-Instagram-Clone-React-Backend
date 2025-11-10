@@ -12,7 +12,6 @@ import java.util.Set;
 public class Conversation {
     private final ConversationId id;
     private final Set<UserId> participantIds;
-    private final Set<UserId> deletedByUserIds;
     private final Instant createdAt;
     private Instant updatedAt;
     private MessageId lastMessageId;
@@ -20,14 +19,12 @@ public class Conversation {
     private Conversation(
             ConversationId id,
             Set<UserId> participantIds,
-            Set<UserId> deletedByUserIds,
             Instant createdAt,
             Instant updatedAt,
             MessageId lastMessageId
     ) {
         this.id = id;
         this.participantIds = participantIds;
-        this.deletedByUserIds = deletedByUserIds;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.lastMessageId = lastMessageId;
@@ -42,7 +39,6 @@ public class Conversation {
         return new Conversation(
                 ConversationId.generate(),
                 participantIds,
-                new java.util.HashSet<>(),
                 now,
                 now,
                 null
@@ -52,7 +48,6 @@ public class Conversation {
     public static Conversation reconstitute(
             ConversationId id,
             Set<UserId> participantIds,
-            Set<UserId> deletedByUserIds,
             Instant createdAt,
             Instant updatedAt,
             MessageId lastMessageId
@@ -60,7 +55,6 @@ public class Conversation {
         return new Conversation(
                 id,
                 participantIds,
-                deletedByUserIds != null ? deletedByUserIds : new java.util.HashSet<>(),
                 createdAt,
                 updatedAt,
                 lastMessageId
@@ -81,22 +75,5 @@ public class Conversation {
                 .filter(id -> !id.equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("User is not a participant"));
-    }
-
-    public void markAsDeletedBy(UserId userId) {
-        if (!hasParticipant(userId)) {
-            throw new IllegalArgumentException("User is not a participant");
-        }
-        this.deletedByUserIds.add(userId);
-        this.updatedAt = Instant.now();
-    }
-
-    public boolean isDeletedBy(UserId userId) {
-        return deletedByUserIds.contains(userId);
-    }
-
-    public void restoreFor(UserId userId) {
-        this.deletedByUserIds.remove(userId);
-        this.updatedAt = Instant.now();
     }
 }

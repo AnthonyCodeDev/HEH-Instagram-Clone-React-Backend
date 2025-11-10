@@ -30,14 +30,6 @@ public class ConversationJpaEntity {
     @Column(name = "participant_id")
     private Set<UUID> participantIds;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "conversation_deleted_by",
-        joinColumns = @JoinColumn(name = "conversation_id")
-    )
-    @Column(name = "user_id")
-    private Set<UUID> deletedByUserIds;
-
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
