@@ -19,6 +19,14 @@ public class UserJpaMapper {
                 PasswordHash.of(entity.getPasswordHash()),
                 entity.getBio(),
                 entity.getAvatarUrl(),
+                entity.getName(),
+                entity.getBannerUrl(),
+                entity.getPhone(),
+                entity.getLocation(),
+                entity.getBirthdate(),
+                entity.getTiktok(),
+                entity.getTwitter(),
+                entity.getYoutube(),
                 entity.getFollowersCount(),
                 entity.getFollowingCount(),
                 entity.getCreatedAt(),
@@ -35,6 +43,14 @@ public class UserJpaMapper {
                 .passwordHash(domain.getPasswordHash().getValue())
                 .bio(domain.getBio())
                 .avatarUrl(domain.getAvatarUrl())
+                .name(domain.getName())
+                .bannerUrl(domain.getBannerUrl())
+                .phone(domain.getPhone())
+                .location(domain.getLocation())
+                .birthdate(domain.getBirthdate())
+                .tiktok(domain.getTiktok())
+                .twitter(domain.getTwitter())
+                .youtube(domain.getYoutube())
                 .followersCount(domain.getFollowersCount())
                 .followingCount(domain.getFollowingCount())
                 .createdAt(domain.getCreatedAt())

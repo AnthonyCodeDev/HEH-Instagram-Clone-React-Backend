@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 public class User {
@@ -23,6 +24,31 @@ public class User {
     
     @Setter
     private String avatarUrl;
+
+    @Setter
+    private String name;
+
+    @Setter
+    private String bannerUrl;
+
+    @Setter
+    private String phone;
+
+    @Setter
+    private String location;
+
+    @Setter
+    private LocalDate birthdate;
+
+    // Social links
+    @Setter
+    private String tiktok;
+
+    @Setter
+    private String twitter;
+
+    @Setter
+    private String youtube;
     
     @Setter(AccessLevel.PACKAGE)
     private int followersCount;
@@ -48,6 +74,14 @@ public class User {
             PasswordHash passwordHash,
             String bio,
             String avatarUrl,
+            String name,
+            String bannerUrl,
+            String phone,
+            String location,
+            LocalDate birthdate,
+            String tiktok,
+            String twitter,
+            String youtube,
             int followersCount,
             int followingCount,
             Instant createdAt,
@@ -60,6 +94,14 @@ public class User {
         this.passwordHash = passwordHash;
         this.bio = bio;
         this.avatarUrl = avatarUrl;
+        this.name = name;
+        this.bannerUrl = bannerUrl;
+        this.phone = phone;
+        this.location = location;
+        this.birthdate = birthdate;
+        this.tiktok = tiktok;
+        this.twitter = twitter;
+        this.youtube = youtube;
         this.followersCount = followersCount;
         this.followingCount = followingCount;
         this.createdAt = createdAt;
@@ -79,6 +121,14 @@ public class User {
                 passwordHash,
                 null,
                 null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 0,
                 0,
                 Instant.now(),
@@ -94,6 +144,14 @@ public class User {
             PasswordHash passwordHash,
             String bio,
             String avatarUrl,
+            String name,
+            String bannerUrl,
+            String phone,
+            String location,
+            LocalDate birthdate,
+            String tiktok,
+            String twitter,
+            String youtube,
             int followersCount,
             int followingCount,
             Instant createdAt,
@@ -107,6 +165,14 @@ public class User {
                 passwordHash,
                 bio,
                 avatarUrl,
+                name,
+                bannerUrl,
+                phone,
+                location,
+                birthdate,
+                tiktok,
+                twitter,
+                youtube,
                 followersCount,
                 followingCount,
                 createdAt,
@@ -115,11 +181,21 @@ public class User {
         );
     }
 
-    public void updateProfile(Username newUsername, Email newEmail, String newBio, String newAvatarUrl) {
+    public void updateProfile(Username newUsername, Email newEmail, String newBio, String newAvatarUrl,
+                              String newName, String newBannerUrl, String newPhone, String newLocation,
+                              LocalDate newBirthdate, String newTiktok, String newTwitter, String newYoutube) {
         this.username = newUsername;
         this.email = newEmail;
         this.bio = newBio;
         this.avatarUrl = newAvatarUrl;
+        this.name = newName;
+        this.bannerUrl = newBannerUrl;
+        this.phone = newPhone;
+        this.location = newLocation;
+        this.birthdate = newBirthdate;
+        this.tiktok = newTiktok;
+        this.twitter = newTwitter;
+        this.youtube = newYoutube;
         this.updatedAt = Instant.now();
     }
 

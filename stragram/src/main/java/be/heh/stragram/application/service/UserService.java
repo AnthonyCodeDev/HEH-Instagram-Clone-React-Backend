@@ -23,7 +23,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class UserService implements GetUserProfileQuery, UpdateUserProfileCommand, DeleteUserCommand,
-    SearchUsersQuery, FollowUserUseCase, UnfollowUserUseCase, be.heh.stragram.application.port.in.ListRandomUsersQuery {
+    SearchUsersQuery, FollowUserUseCase, UnfollowUserUseCase, be.heh.stragram.application.port.in.ListRandomUsersQuery,
+    be.heh.stragram.application.port.in.ChangePasswordUseCase {
 
     // Also implement random listing
     // Will delegate to SearchUsersPort.findRandomUsers
@@ -34,6 +35,7 @@ public class UserService implements GetUserProfileQuery, UpdateUserProfileComman
     private final FollowPort followPort;
     private final NotificationPort notificationPort;
     private final FollowDomainService followDomainService;
+    private final be.heh.stragram.application.port.out.PasswordEncoderPort passwordEncoderPort;
 
 
     @Override
@@ -71,7 +73,17 @@ public class UserService implements GetUserProfileQuery, UpdateUserProfileComman
         Username username = Username.of(command.getUsername());
         Email email = Email.of(command.getEmail());
         
-        user.updateProfile(username, email, command.getBio(), command.getAvatarUrl());
+        // Extract social links from map
+        String tiktok = null, twitter = null, youtube = null;
+        if (command.getSocialLinks() != null) {
+            tiktok = command.getSocialLinks().get("tiktok");
+            twitter = command.getSocialLinks().get("twitter");
+            youtube = command.getSocialLinks().get("youtube");
+        }
+        
+        user.updateProfile(username, email, command.getBio(), command.getAvatarUrl(),
+                command.getName(), command.getBannerUrl(), command.getPhone(), command.getLocation(),
+                command.getBirthdate(), tiktok, twitter, youtube);
         user.validateBioLength(500);
         
         return saveUserPort.save(user);
@@ -177,5 +189,26 @@ public class UserService implements GetUserProfileQuery, UpdateUserProfileComman
         
         // Delete follow relationship
         followPort.delete(followerId, targetId);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(UserId userId, ChangePasswordUseCase.ChangePasswordCommand command) {
+        User user = loadUserPort.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User", userId.toString()));
+
+        // Verify current password
+        if (!passwordEncoderPort.matches(command.getCurrentPassword(), user.getPasswordHash())) {
+            throw new UnauthorizedActionException("Current password is incorrect");
+        }
+
+        // Basic validation for new password
+        if (command.getNewPassword() == null || command.getNewPassword().length() < 8) {
+            throw new ValidationException("New password must be at least 8 characters long");
+        }
+
+        be.heh.stragram.application.domain.value.PasswordHash newHash = passwordEncoderPort.encode(command.getNewPassword());
+        user.changePassword(newHash);
+        saveUserPort.save(user);
     }
 }
