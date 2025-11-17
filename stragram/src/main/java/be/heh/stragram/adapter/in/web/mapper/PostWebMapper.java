@@ -1,7 +1,6 @@
 package be.heh.stragram.adapter.in.web.mapper;
 
 import be.heh.stragram.adapter.in.web.dto.PostDtos;
-import be.heh.stragram.application.domain.model.Favorite;
 import be.heh.stragram.application.domain.model.Like;
 import be.heh.stragram.application.domain.model.Post;
 import be.heh.stragram.application.domain.model.User;
@@ -16,23 +15,20 @@ public class PostWebMapper {
 
     private final LoadUserPort loadUserPort;
     private final LikePostPort likePostPort;
-    private final FavoritePostPort favoritePostPort;
     private final ImageStoragePort imageStoragePort;
     private final LoadCommentsPort loadCommentsPort;
+    private final BookmarkPort bookmarkPort;
 
     public PostDtos.PostResponse toPostResponse(Post post, UserId currentUserId) {
         User author = loadUserPort.findById(post.getAuthorId())
                 .orElseThrow(() -> new IllegalStateException("Post author not found"));
 
         boolean isLiked = false;
-        boolean isFavorited = false;
+        boolean isBookmarked = false;
         
         if (currentUserId != null) {
             isLiked = likePostPort.exists(post.getId(), currentUserId);
-            isFavorited = favoritePostPort.exists(post.getId(), currentUserId);
-            System.out.println("Checking likes for post " + post.getId() + " and user " + currentUserId + ": isLiked=" + isLiked);
-        } else {
-            System.out.println("User not authenticated when checking post " + post.getId());
+            isBookmarked = bookmarkPort.existsByUserIdAndPostId(currentUserId, post.getId());
         }
 
         // Calculer les compteurs à la demande
@@ -51,7 +47,7 @@ public class PostWebMapper {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .isLikedByCurrentUser(isLiked)
-                .isFavoritedByCurrentUser(isFavorited)
+                .isBookmarkedByCurrentUser(isBookmarked)
                 .build();
     }
 
@@ -60,14 +56,6 @@ public class PostWebMapper {
                 .postId(like.getPostId().toString())
                 .userId(like.getUserId().toString())
                 .createdAt(like.getCreatedAt())
-                .build();
-    }
-
-    public PostDtos.FavoriteResponse toFavoriteResponse(Favorite favorite) {
-        return PostDtos.FavoriteResponse.builder()
-                .postId(favorite.getPostId().toString())
-                .userId(favorite.getUserId().toString())
-                .createdAt(favorite.getCreatedAt())
                 .build();
     }
 }

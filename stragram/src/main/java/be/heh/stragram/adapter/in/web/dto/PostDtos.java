@@ -1,6 +1,5 @@
 package be.heh.stragram.adapter.in.web.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,7 +46,7 @@ public class PostDtos {
         private Instant createdAt;
         private Instant updatedAt;
         private boolean isLikedByCurrentUser;
-        private boolean isFavoritedByCurrentUser;
+        private boolean isBookmarkedByCurrentUser;
     }
 
     @Data
@@ -66,16 +65,6 @@ public class PostDtos {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LikeResponse {
-        private String postId;
-        private String userId;
-        private Instant createdAt;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class FavoriteResponse {
         private String postId;
         private String userId;
         private Instant createdAt;

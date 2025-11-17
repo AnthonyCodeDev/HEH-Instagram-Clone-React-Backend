@@ -2,8 +2,11 @@ package be.heh.stragram.adapter.out.persistence.jpa.adapter;
 
 import be.heh.stragram.adapter.out.persistence.jpa.SpringDataLikeRepository;
 import be.heh.stragram.adapter.out.persistence.jpa.entity.LikeJpaEntity;
+import be.heh.stragram.adapter.out.persistence.jpa.entity.PostJpaEntity;
 import be.heh.stragram.adapter.out.persistence.jpa.mapper.LikeJpaMapper;
+import be.heh.stragram.adapter.out.persistence.jpa.mapper.PostJpaMapper;
 import be.heh.stragram.application.domain.model.Like;
+import be.heh.stragram.application.domain.model.Post;
 import be.heh.stragram.application.domain.value.PostId;
 import be.heh.stragram.application.domain.value.UserId;
 import be.heh.stragram.application.port.out.LikePostPort;
@@ -11,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +24,7 @@ public class LikeRepositoryAdapter implements LikePostPort {
 
     private final SpringDataLikeRepository likeRepository;
     private final LikeJpaMapper likeMapper;
+    private final PostJpaMapper postMapper;
 
     @Override
     public Like save(Like like) {
@@ -46,5 +52,23 @@ public class LikeRepositoryAdapter implements LikePostPort {
     @Override
     public int countByPostId(PostId postId) {
         return likeRepository.countById_PostId(postId.getValue());
+    }
+
+    @Override
+    public List<Post> findLikedPostsByUserId(UserId userId, int page, int size) {
+        int offset = page * size;
+        List<PostJpaEntity> postEntities = likeRepository.findLikedPostsByUserId(
+                userId.getValue(),
+                offset,
+                size
+        );
+        return postEntities.stream()
+                .map(postMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByUserId(UserId userId) {
+        return likeRepository.countById_UserId(userId.getValue());
     }
 }

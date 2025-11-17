@@ -1,6 +1,7 @@
 package be.heh.stragram.application.service;
 
 import be.heh.stragram.application.domain.exception.NotFoundException;
+import be.heh.stragram.application.domain.exception.ValidationException;
 import be.heh.stragram.application.domain.model.Like;
 import be.heh.stragram.application.domain.model.Notification;
 import be.heh.stragram.application.domain.model.Post;
@@ -8,6 +9,7 @@ import be.heh.stragram.application.domain.model.User;
 import be.heh.stragram.application.domain.value.PostId;
 import be.heh.stragram.application.domain.value.UserId;
 import be.heh.stragram.application.port.in.LikePostUseCase;
+import be.heh.stragram.application.port.in.ListLikesQuery;
 import be.heh.stragram.application.port.in.UnlikePostUseCase;
 import be.heh.stragram.application.port.out.*;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class LikeService implements LikePostUseCase, UnlikePostUseCase {
+public class LikeService implements LikePostUseCase, UnlikePostUseCase, ListLikesQuery {
 
     private final LoadPostPort loadPostPort;
     private final SavePostPort savePostPort;
@@ -96,5 +99,28 @@ public class LikeService implements LikePostUseCase, UnlikePostUseCase {
 
         // Nous n'avons plus besoin de mettre à jour le compteur de likes
         // car il est maintenant calculé à la demande
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Post> listLikedPosts(UserId userId, int page, int size) {
+        if (size <= 0 || size > 100) {
+            throw new ValidationException("Size must be between 1 and 100");
+        }
+        
+        return likePostPort.findLikedPostsByUserId(userId, page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasMore(UserId userId, int page, int size) {
+        long total = likePostPort.countByUserId(userId);
+        return (long) (page + 1) * size < total;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countLikes(UserId userId) {
+        return likePostPort.countByUserId(userId);
     }
 }
