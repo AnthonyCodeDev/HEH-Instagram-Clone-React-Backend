@@ -58,6 +58,12 @@ class UserControllerTests {
     private ChangePasswordUseCase changePasswordUseCase;
 
     @Mock
+    private be.heh.stragram.application.port.in.ListFollowersQuery listFollowersQuery;
+
+    @Mock
+    private be.heh.stragram.application.port.in.ListFollowingQuery listFollowingQuery;
+
+    @Mock
     private UserWebMapper userWebMapper;
 
     private UserController userController;
@@ -76,6 +82,8 @@ class UserControllerTests {
                 unfollowUserUseCase,
                 imageStoragePort,
                 changePasswordUseCase,
+                listFollowersQuery,
+                listFollowingQuery,
                 userWebMapper
         );
 

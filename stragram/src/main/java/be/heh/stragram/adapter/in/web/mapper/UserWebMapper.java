@@ -81,4 +81,36 @@ public class UserWebMapper {
                 .bannerUrl(user.getBannerUrl())
                 .build();
     }
+
+    public UserDtos.FollowerItem toFollowerItem(User user, UserId currentUserId) {
+        boolean isFollowing = false;
+        if (currentUserId != null && !currentUserId.equals(user.getId())) {
+            isFollowing = followPort.exists(currentUserId, user.getId());
+        }
+
+        return UserDtos.FollowerItem.builder()
+                .id(user.getId().toString())
+                .username(user.getUsername().toString())
+                .name(user.getName())
+                .avatarUrl(user.getAvatarUrl())
+                .bio(user.getBio())
+                .isCurrentUserFollowing(isFollowing)
+                .build();
+    }
+
+    public UserDtos.FollowingItem toFollowingItem(User user, UserId currentUserId) {
+        boolean isFollowing = false;
+        if (currentUserId != null && !currentUserId.equals(user.getId())) {
+            isFollowing = followPort.exists(currentUserId, user.getId());
+        }
+
+        return UserDtos.FollowingItem.builder()
+                .id(user.getId().toString())
+                .username(user.getUsername().toString())
+                .name(user.getName())
+                .avatarUrl(user.getAvatarUrl())
+                .bio(user.getBio())
+                .isCurrentUserFollowing(isFollowing)
+                .build();
+    }
 }

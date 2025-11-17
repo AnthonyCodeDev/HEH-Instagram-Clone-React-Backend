@@ -62,4 +62,14 @@ public class FollowRepositoryAdapter implements FollowPort {
                 .map(UserId::of)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public long countFollowing(UserId followerId) {
+        return followRepository.countByFollowerId(followerId.getValue());
+    }
+    
+    @Override
+    public long countFollowers(UserId followingId) {
+        return followRepository.countByFollowingId(followingId.getValue());
+    }
 }

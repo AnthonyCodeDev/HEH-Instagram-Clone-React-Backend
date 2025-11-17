@@ -19,4 +19,8 @@ public interface FollowPort {
     List<UserId> findFollowingIds(UserId followerId, int page, int size);
     
     List<UserId> findFollowerIds(UserId followingId, int page, int size);
+    
+    long countFollowing(UserId followerId);
+    
+    long countFollowers(UserId followingId);
 }

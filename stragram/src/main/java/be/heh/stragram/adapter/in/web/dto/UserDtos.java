@@ -111,4 +111,54 @@ public class UserDtos {
         private String followingId;
         private Instant createdAt;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FollowerItem {
+        private String id;
+        private String username;
+        private String name;
+        private String avatarUrl;
+        private String bio;
+        private boolean isCurrentUserFollowing;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FollowersListResponse {
+        private List<FollowerItem> followers;
+        private int page;
+        private int size;
+        private long totalCount;
+        private boolean hasMore;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FollowingItem {
+        private String id;
+        private String username;
+        private String name;
+        private String avatarUrl;
+        private String bio;
+        private boolean isCurrentUserFollowing;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FollowingListResponse {
+        private List<FollowingItem> following;
+        private int page;
+        private int size;
+        private long totalCount;
+        private boolean hasMore;
+    }
 }

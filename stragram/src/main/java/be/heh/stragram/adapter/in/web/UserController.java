@@ -30,6 +30,8 @@ public class UserController {
     private final UnfollowUserUseCase unfollowUserUseCase;
     private final be.heh.stragram.application.port.out.ImageStoragePort imageStoragePort;
     private final be.heh.stragram.application.port.in.ChangePasswordUseCase changePasswordUseCase;
+    private final be.heh.stragram.application.port.in.ListFollowersQuery listFollowersQuery;
+    private final be.heh.stragram.application.port.in.ListFollowingQuery listFollowingQuery;
     private final UserWebMapper userWebMapper;
 
     @GetMapping("/{id}")
@@ -380,5 +382,59 @@ public class UserController {
 
         unfollowUserUseCase.unfollow(currentUserId, targetId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/followers")
+    public ResponseEntity<UserDtos.FollowersListResponse> getFollowers(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal UserId currentUserId) {
+        
+        UserId userId = UserId.fromString(id);
+        
+        List<User> followers = listFollowersQuery.listFollowers(userId, page, size);
+        long totalCount = listFollowersQuery.countFollowers(userId);
+        
+        List<UserDtos.FollowerItem> followerItems = followers.stream()
+                .map(user -> userWebMapper.toFollowerItem(user, currentUserId))
+                .collect(Collectors.toList());
+        
+        UserDtos.FollowersListResponse response = UserDtos.FollowersListResponse.builder()
+                .followers(followerItems)
+                .page(page)
+                .size(size)
+                .totalCount(totalCount)
+                .hasMore((long) (page + 1) * size < totalCount)
+                .build();
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/following")
+    public ResponseEntity<UserDtos.FollowingListResponse> getFollowing(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal UserId currentUserId) {
+        
+        UserId userId = UserId.fromString(id);
+        
+        List<User> following = listFollowingQuery.listFollowing(userId, page, size);
+        long totalCount = listFollowingQuery.countFollowing(userId);
+        
+        List<UserDtos.FollowingItem> followingItems = following.stream()
+                .map(user -> userWebMapper.toFollowingItem(user, currentUserId))
+                .collect(Collectors.toList());
+        
+        UserDtos.FollowingListResponse response = UserDtos.FollowingListResponse.builder()
+                .following(followingItems)
+                .page(page)
+                .size(size)
+                .totalCount(totalCount)
+                .hasMore((long) (page + 1) * size < totalCount)
+                .build();
+        
+        return ResponseEntity.ok(response);
     }
 }

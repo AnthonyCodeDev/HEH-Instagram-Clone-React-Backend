@@ -25,4 +25,10 @@ public interface SpringDataFollowRepository extends JpaRepository<FollowRelation
     
     @Query("SELECT f.id.followerId FROM FollowRelationshipJpaEntity f WHERE f.id.followingId = :followingId")
     Page<UUID> findFollowerIds(UUID followingId, Pageable pageable);
+    
+    @Query("SELECT COUNT(f) FROM FollowRelationshipJpaEntity f WHERE f.id.followerId = :followerId")
+    long countByFollowerId(UUID followerId);
+    
+    @Query("SELECT COUNT(f) FROM FollowRelationshipJpaEntity f WHERE f.id.followingId = :followingId")
+    long countByFollowingId(UUID followingId);
 }
